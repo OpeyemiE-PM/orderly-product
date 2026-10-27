@@ -1,0 +1,820 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orderly | Simple Order Management</title>
+  <meta name="description" content="A simple order management tool for small businesses.">
+  <style>
+    :root {
+      --teal: #087f70;
+      --teal-dark: #075e54;
+      --bg: #f5f7f8;
+      --white: #ffffff;
+      --text: #172b2a;
+      --muted: #697977;
+      --border: #e2e9e8;
+      --amber: #a16207;
+      --red: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 7%;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 800;
+      color: var(--teal);
+      letter-spacing: -1px;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .nav { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 16px;
+      font-weight: 700;
+      transition: background .15s;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: white;
+    }
+
+    .btn-primary:hover { background: var(--teal-dark); }
+
+    .btn-secondary {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: #fff0ef;
+      color: var(--red);
+    }
+
+    .hero {
+      padding: 75px 7% 65px;
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      align-items: center;
+      gap: 40px;
+      background: linear-gradient(135deg, #e6f5f0, #f8fbfa);
+    }
+
+    .eyebrow {
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 1.08;
+      letter-spacing: -2px;
+      margin: 15px 0;
+    }
+
+    h2 { letter-spacing: -0.6px; }
+
+    .hero p {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 500px;
+      margin-bottom: 25px;
+    }
+
+    .preview {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 15px 45px #173e3512;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .preview-stat, .stat {
+      padding: 16px;
+      background: #f7faf9;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .preview-stat strong, .stat strong {
+      display: block;
+      font-size: 27px;
+      margin-top: 6px;
+    }
+
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .features {
+      padding: 55px 7%;
+      background: white;
+    }
+
+    .features h2, .features > p { text-align: center; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 30px;
+    }
+
+    .feature {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    .feature-icon { font-size: 27px; }
+
+    .footer {
+      padding: 25px 7%;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .app { display: none; padding: 35px 7% 60px; }
+    .app.active { display: block; }
+
+    .app-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+    }
+
+    .app-heading h1 { font-size: 34px; margin: 0; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .stat { background: white; }
+    .stat strong { font-size: 30px; }
+
+    .panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .panel h2 { margin-top: 0; font-size: 19px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 13px; font-weight: 700; }
+
+    .field input, .field select, .toolbar input, .toolbar select {
+      width: 100%;
+      min-width: 0;
+      padding: 11px;
+      border: 1px solid #d4dfdd;
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .toolbar input { flex: 1; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 14px 10px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    td select {
+      padding: 7px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: white;
+      max-width: 145px;
+    }
+
+    .status {
+      display: inline-block;
+      border-radius: 30px;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .status-Pending { background: #fff3d6; color: var(--amber); }
+    .status-Processing { background: #e7efff; color: #2457a6; }
+    .status-Delivered { background: #dcf7e8; color: #167447; }
+
+    .empty {
+      padding: 35px 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .notice {
+      margin: 12px 0;
+      padding: 12px;
+      border-radius: 8px;
+      background: #e6f5f0;
+      color: var(--teal-dark);
+      font-size: 13px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 760px) {
+      .hero { grid-template-columns: 1fr; padding: 48px 6%; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .topbar { padding: 15px 5%; }
+      .app { padding: 25px 5%; }
+      .features { padding: 40px 6%; }
+    }
+
+    @media (max-width: 440px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .toolbar { flex-direction: column; }
+      .nav .btn { padding: 9px 10px; }
+      .preview { padding: 15px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      orderly.
+      <small>ORDERS MADE SIMPLE</small>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="btn btn-secondary" id="homeNav">Home</button>
+      <button class="btn btn-primary" id="dashboardNav">Dashboard</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="landing">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">Made for small businesses</span>
+          <h1>Every order.<br>Under control.</h1>
+          <p>
+            Stop losing track of customer orders in busy chats.
+            Keep your orders organised, follow their progress and
+            know what needs your attention.
+          </p>
+          <button class="btn btn-primary" id="getStarted">
+            Get Started &rarr;
+          </button>
+          <p class="muted">A simple order manager. No complicated setup.</p>
+        </div>
+
+        <div class="preview">
+          <div class="muted">YOUR BUSINESS AT A GLANCE</div>
+          <h2>Order overview</h2>
+          <div class="preview-grid">
+            <div class="preview-stat">
+              <span class="muted">Total orders</span>
+              <strong>48</strong>
+            </div>
+            <div class="preview-stat">
+              <span class="muted">Pending</span>
+              <strong>12</strong>
+            </div>
+            <div class="preview-stat">
+              <span class="muted">Processing</span>
+              <strong>8</strong>
+            </div>
+            <div class="preview-stat">
+              <span class="muted">Delivered</span>
+              <strong>28</strong>
+            </div>
+          </div>
+          <p class="muted">Illustrative preview · Sample figures</p>
+        </div>
+      </div>
+
+      <section class="features">
+        <h2>Less confusion. More control.</h2>
+        <p class="muted">Everything you need to manage everyday orders.</p>
+        <div class="feature-grid">
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">📦</div>
+            <h3>Record orders</h3>
+            <p class="muted">Keep customer and product details together in one place.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">📋</div>
+            <h3>Track progress</h3>
+            <p class="muted">See which orders are pending, being processed or delivered.</p>
+          </article>
+          <article class="feature">
+            <div class="feature-icon" aria-hidden="true">📊</div>
+            <h3>See the bigger picture</h3>
+            <p class="muted">Get a quick view of your workload from your dashboard.</p>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section id="dashboard" class="app">
+      <div class="app-heading">
+        <div>
+          <span class="eyebrow">Your workspace</span>
+          <h1>Order dashboard</h1>
+          <p class="muted">Manage your orders in one place.</p>
+        </div>
+        <button class="btn btn-secondary" id="backHome">← Back to home</button>
+      </div>
+
+      <div class="notice">
+        Demo mode: your orders are saved in this browser only.
+        Do not enter real customer or payment information.
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="muted">Total orders</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="muted">Pending</span>
+          <strong id="pendingCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="muted">Processing</span>
+          <strong id="processingCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="muted">Delivered</span>
+          <strong id="deliveredCount">0</strong>
+        </div>
+      </div>
+
+      <section class="panel">
+        <h2 id="formTitle">+ Add a new order</h2>
+        <form id="orderForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="customer">Customer name</label>
+              <input id="customer" name="customer" maxlength="80"
+                placeholder="e.g. Ada" required>
+            </div>
+            <div class="field">
+              <label for="product">Product or item</label>
+              <input id="product" name="product" maxlength="100"
+                placeholder="e.g. Skincare set" required>
+            </div>
+            <div class="field">
+              <label for="amount">Order amount (₦)</label>
+              <input id="amount" name="amount" type="number"
+                min="0.01" max="1000000000" step="0.01"
+                placeholder="e.g. 15000" required>
+            </div>
+            <div class="field">
+              <label for="orderDate">Order date</label>
+              <input id="orderDate" name="orderDate" type="date" required>
+            </div>
+            <div class="field">
+              <label for="orderStatus">Order status</label>
+              <select id="orderStatus" name="orderStatus">
+                <option>Pending</option>
+                <option>Processing</option>
+                <option>Delivered</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="saveButton">
+              Add order
+            </button>
+            <button class="btn btn-secondary hidden" type="button" id="cancelEdit">
+              Cancel edit
+            </button>
+            <button class="btn btn-secondary" type="button" id="clearDemo">
+              Clear demo data
+            </button>
+          </div>
+          <p id="formMessage" class="muted" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>All orders</h2>
+        <div class="toolbar">
+          <input id="searchInput" type="search"
+            placeholder="Search by customer, product or order ID"
+            aria-label="Search orders">
+          <select id="statusFilter" aria-label="Filter orders by status">
+            <option value="All">All statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Processing">Processing</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="orderTable"></tbody>
+          </table>
+          <div id="emptyState" class="empty hidden">
+            <h3>No orders found</h3>
+            <p>Try a different search or add a new order.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Orderly · Portfolio MVP · Demo data only
+  </footer>
+
+  <script>
+    const STORAGE_KEY = "orderly_demo_orders_v1";
+    const STATUSES = ["Pending", "Processing", "Delivered"];
+
+    const initialOrders = [
+      {
+        id: "ORD-1001", customer: "Ada", product: "Skincare set",
+        amount: 15000, date: "2026-10-20", status: "Pending"
+      },
+      {
+        id: "ORD-1002", customer: "Tomi", product: "Classic shirt",
+        amount: 8500, date: "2026-10-21", status: "Processing"
+      },
+      {
+        id: "ORD-1003", customer: "Maya", product: "Body butter",
+        amount: 12000, date: "2026-10-22", status: "Delivered"
+      }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+
+    let orders = loadOrders();
+    let editingId = null;
+
+    function loadOrders() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === null) return initialOrders.map(order => ({ ...order }));
+
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(order =>
+          order &&
+          typeof order.id === "string" &&
+          typeof order.customer === "string" &&
+          typeof order.product === "string" &&
+          Number.isFinite(order.amount) &&
+          typeof order.date === "string" &&
+          STATUSES.includes(order.status)
+        );
+      } catch (error) {
+        console.error("Could not load saved orders.", error);
+        return [];
+      }
+    }
+
+    function saveOrders() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+        return true;
+      } catch (error) {
+        console.error("Could not save orders.", error);
+        showMessage("Your browser could not save the data. Check browser storage settings.");
+        return false;
+      }
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    function formatMoney(amount) {
+      return "₦" + amount.toLocaleString("en-NG", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function showMessage(message) {
+      $("formMessage").textContent = message;
+    }
+
+    function showPage(page) {
+      const showDashboard = page === "dashboard";
+      $("landing").classList.toggle("hidden", showDashboard);
+      $("dashboard").classList.toggle("active", showDashboard);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (showDashboard) renderOrders();
+    }
+
+    function renderOrders() {
+      $("totalCount").textContent = orders.length;
+      $("pendingCount").textContent =
+        orders.filter(order => order.status === "Pending").length;
+      $("processingCount").textContent =
+        orders.filter(order => order.status === "Processing").length;
+      $("deliveredCount").textContent =
+        orders.filter(order => order.status === "Delivered").length;
+
+      const query = $("searchInput").value.trim().toLowerCase();
+      const selectedStatus = $("statusFilter").value;
+
+      const filtered = orders.filter(order => {
+        const matchesSearch = [
+          order.id, order.customer, order.product
+        ].some(value => value.toLowerCase().includes(query));
+
+        const matchesStatus =
+          selectedStatus === "All" || order.status === selectedStatus;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      $("orderTable").innerHTML = filtered.map(order => `
+        <tr>
+          <td><strong>${escapeHTML(order.id)}</strong></td>
+          <td>${escapeHTML(order.customer)}</td>
+          <td>${escapeHTML(order.product)}</td>
+          <td>${formatMoney(order.amount)}</td>
+          <td>${escapeHTML(order.date)}</td>
+          <td>
+            <select data-action="status" data-id="${escapeHTML(order.id)}"
+              aria-label="Status for ${escapeHTML(order.id)}">
+              ${STATUSES.map(status => `
+                <option value="${status}" ${order.status === status ? "selected" : ""}>
+                  ${status}
+                </option>
+              `).join("")}
+            </select>
+          </td>
+          <td>
+            <button class="btn btn-secondary" data-action="edit"
+              data-id="${escapeHTML(order.id)}">Edit</button>
+            <button class="btn btn-danger" data-action="delete"
+              data-id="${escapeHTML(order.id)}">Delete</button>
+          </td>
+        </tr>
+      `).join("");
+
+      $("emptyState").classList.toggle("hidden", filtered.length !== 0);
+    }
+
+    function resetForm() {
+      editingId = null;
+      $("orderForm").reset();
+      $("orderDate").value = new Date().toLocaleDateString("en-CA");
+      $("orderStatus").value = "Pending";
+      $("formTitle").textContent = "+ Add a new order";
+      $("saveButton").textContent = "Add order";
+      $("cancelEdit").classList.add("hidden");
+      showMessage("");
+    }
+
+    function startEdit(id) {
+      const order = orders.find(item => item.id === id);
+      if (!order) return;
+
+      editingId = id;
+      $("customer").value = order.customer;
+      $("product").value = order.product;
+      $("amount").value = order.amount;
+      $("orderDate").value = order.date;
+      $("orderStatus").value = order.status;
+      $("formTitle").textContent = "Edit " + order.id;
+      $("saveButton").textContent = "Save changes";
+      $("cancelEdit").classList.remove("hidden");
+      showMessage("Editing " + order.id);
+      $("customer").focus();
+      $("formTitle").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    $("getStarted").addEventListener("click", () => showPage("dashboard"));
+    $("dashboardNav").addEventListener("click", () => showPage("dashboard"));
+    $("homeNav").addEventListener("click", () => showPage("home"));
+    $("backHome").addEventListener("click", () => showPage("home"));
+
+    $("orderDate").value = new Date().toLocaleDateString("en-CA");
+
+    $("orderForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const customer = $("customer").value.trim();
+      const product = $("product").value.trim();
+      const amount = Number($("amount").value);
+      const date = $("orderDate").value;
+      const status = $("orderStatus").value;
+
+      if (!customer || !product || !date ||
+          !Number.isFinite(amount) || amount <= 0 ||
+          amount > 1000000000 || !STATUSES.includes(status)) {
+        showMessage("Please enter valid information in every required field.");
+        return;
+      }
+
+      const previousOrders = orders.map(order => ({ ...order }));
+
+      if (editingId) {
+        orders = orders.map(order => order.id === editingId
+          ? { ...order, customer, product, amount, date, status }
+          : order
+        );
+      } else {
+        const nextNumber = orders.reduce((max, order) => {
+          const match = order.id.match(/^ORD-(\d+)$/);
+          return match ? Math.max(max, Number(match[1])) : max;
+        }, 1000) + 1;
+
+        orders.unshift({
+          id: "ORD-" + nextNumber,
+          customer, product, amount, date, status
+        });
+      }
+
+      if (!saveOrders()) {
+        orders = previousOrders;
+        renderOrders();
+        return;
+      }
+
+      resetForm();
+      renderOrders();
+      showMessage(editingId ? "Order updated." : "Order saved successfully.");
+    });
+
+    $("cancelEdit").addEventListener("click", resetForm);
+    $("searchInput").addEventListener("input", renderOrders);
+    $("statusFilter").addEventListener("change", renderOrders);
+
+    $("orderTable").addEventListener("change", event => {
+      const target = event.target;
+      if (target.dataset.action !== "status") return;
+
+      const order = orders.find(item => item.id === target.dataset.id);
+      if (!order || !STATUSES.includes(target.value)) return;
+
+      const previousStatus = order.status;
+      order.status = target.value;
+
+      if (!saveOrders()) {
+        order.status = previousStatus;
+      } else {
+        showMessage("Order status updated.");
+      }
+
+      renderOrders();
+    });
+
+    $("orderTable").addEventListener("click", event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+
+      const id = button.dataset.id;
+
+      if (button.dataset.action === "edit") {
+        startEdit(id);
+      }
+
+      if (button.dataset.action === "delete") {
+        const order = orders.find(item => item.id === id);
+        if (!order) return;
+
+        if (!confirm("Delete " + order.id + "? This cannot be undone.")) return;
+
+        const previousOrders = orders;
+        orders = orders.filter(item => item.id !== id);
+
+        if (!saveOrders()) {
+          orders = previousOrders;
+          renderOrders();
+          return;
+        }
+
+        if (editingId === id) resetForm();
+        showMessage("Order deleted.");
+        renderOrders();
+      }
+    });
+
+    $("clearDemo").addEventListener("click", () => {
+      if (!confirm("Clear all orders saved in this browser?")) return;
+
+      const previousOrders = orders;
+      orders = [];
+
+      if (!saveOrders()) {
+        orders = previousOrders;
+        renderOrders();
+        return;
+      }
+
+      resetForm();
+      renderOrders();
+      showMessage("All orders cleared. Add a new order to get started.");
+    });
+
+    renderOrders();
+  </script>
+</body>
+</html>
