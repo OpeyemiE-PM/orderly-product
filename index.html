@@ -357,19 +357,19 @@
           <div class="preview-grid">
             <div class="preview-stat">
               <span class="muted">Total orders</span>
-              <strong>48</strong>
+              <strong id="previewTotal">0</strong>
             </div>
             <div class="preview-stat">
               <span class="muted">Pending</span>
-              <strong>12</strong>
+              <strong id="previewPending">0</strong>
             </div>
             <div class="preview-stat">
               <span class="muted">Processing</span>
-              <strong>8</strong>
+              <strong id="previewProcessing">0</strong>
             </div>
             <div class="preview-stat">
               <span class="muted">Delivered</span>
-              <strong>28</strong>
+              <strong id="previewDelivered">0</strong>
             </div>
           </div>
           <p class="muted">Illustrative preview · Sample figures</p>
@@ -610,12 +610,21 @@
     }
 
     function renderOrders() {
+      // Dashboard and landing-page metrics always reflect all saved orders.
       $("totalCount").textContent = orders.length;
       $("pendingCount").textContent =
         orders.filter(order => order.status === "Pending").length;
       $("processingCount").textContent =
         orders.filter(order => order.status === "Processing").length;
       $("deliveredCount").textContent =
+        orders.filter(order => order.status === "Delivered").length;
+
+      $("previewTotal").textContent = orders.length;
+      $("previewPending").textContent =
+        orders.filter(order => order.status === "Pending").length;
+      $("previewProcessing").textContent =
+        orders.filter(order => order.status === "Processing").length;
+      $("previewDelivered").textContent =
         orders.filter(order => order.status === "Delivered").length;
 
       const query = $("searchInput").value.trim().toLowerCase();
@@ -695,7 +704,16 @@
     $("homeNav").addEventListener("click", () => showPage("home"));
     $("backHome").addEventListener("click", () => showPage("home"));
 
-    $("orderDate").value = new Date().toLocaleDateString("en-CA");
+    function getLocalDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+    $("orderDate").value = getLocalDate();
 
     $("orderForm").addEventListener("submit", event => {
       event.preventDefault();
@@ -713,6 +731,7 @@
         return;
       }
 
+      const wasEditing = editingId !== null;
       const previousOrders = orders.map(order => ({ ...order }));
 
       if (editingId) {
@@ -738,9 +757,11 @@
         return;
       }
 
-      resetForm();
-      renderOrders();
-      showMessage(editingId ? "Order updated." : "Order saved successfully.");
+        resetForm();
+        renderOrders();
+        showMessage(
+          wasEditing ? "Order updated successfully." : "Order saved successfully."
+        );
     });
 
     $("cancelEdit").addEventListener("click", resetForm);
@@ -809,8 +830,8 @@
         return;
       }
 
-      resetForm();
       renderOrders();
+      resetForm();
       showMessage("All orders cleared. Add a new order to get started.");
     });
 
